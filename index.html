@@ -1,241 +1,134 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mockup Matrícula e Inscripción</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat - Mockup</n>
   <!-- Bootstrap CSS -->
-  <link 
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/css/bootstrap.min.css" 
-    rel="stylesheet"
-  />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body, html { height: 100%; margin: 0; }
     .sidebar {
       background-color: #dc3545;
       color: #fff;
+      width: 250px;
       height: 100%;
       position: fixed;
-      width: 200px;
+      overflow-y: auto;
       padding-top: 1rem;
-      transition: width 0.3s;
     }
-    .sidebar.collapsed { width: 60px; }
-    .sidebar h4 {
-      text-align: center;
-      margin-bottom: 1rem;
-      transition: opacity 0.3s;
-    }
-    .sidebar.collapsed h4 { opacity: 0; }
-    .sidebar .nav-link {
-      color: #fff;
+    .sidebar .chat-item {
+      cursor: pointer;
       transition: background 0.2s;
     }
-    .sidebar .nav-link:hover {
+    .sidebar .chat-item:hover, .sidebar .chat-item.active {
       background-color: #b02a37;
     }
     .content {
-      margin-left: 200px;
+      margin-left: 250px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-header {
+      background-color: #fff;
       padding: 1rem;
-      transition: margin-left 0.3s;
+      border-bottom: 1px solid #ddd;
     }
-    .sidebar.collapsed + .content { margin-left: 60px; }
-    .table-responsive { max-height: calc(100vh - 200px); overflow-y: auto; }
-    .fade-enter {
-      opacity: 0;
-      transform: translateX(20px);
-      transition: all 0.3s;
+    .chat-body {
+      flex: 1;
+      padding: 1rem;
+      background-color: #f2f2f2;
+      overflow-y: auto;
     }
-    .fade-enter-active {
-      opacity: 1;
-      transform: translateX(0);
+    .message {
+      max-width: 70%;
+      margin-bottom: 1rem;
+      padding: .5rem 1rem;
+      border-radius: 1rem;
+      position: relative;
+    }
+    .message.sent {
+      background-color: #dc3545;
+      color: #fff;
+      margin-left: auto;
+      border-bottom-right-radius: .25rem;
+    }
+    .message.received {
+      background-color: #fff;
+      color: #000;
+      margin-right: auto;
+      border-bottom-left-radius: .25rem;
+    }
+    .chat-footer {
+      padding: 0.5rem;
+      background-color: #fff;
+      border-top: 1px solid #ddd;
+    }
+    .chat-footer .form-control {
+      border-radius: 2rem;
+      padding-right: 3rem;
+    }
+    .send-btn {
+      position: absolute;
+      right: 1rem;
+      bottom: .75rem;
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
 <body>
-  <div class="sidebar" id="sidebar">
-    <h4>Menú</h4>
-    <button class="btn btn-sm btn-light ms-2 mb-3" onclick="toggleSidebar()">☰</button>
-    <ul class="nav nav-pills flex-column">
-      <li class="nav-item mb-2">
-        <a class="nav-link active" href="#" id="menu-matricula" onclick="showView('asignaturas-view')">Matrícula</a>
+  <div class="sidebar">
+    <h5 class="text-center">Chats</h5>
+    <ul class="list-unstyled">
+      <li class="chat-item p-2 active">
+        <strong>Juan Pérez</strong><br>
+        <small>Hola, ¿cómo estás?</small>
       </li>
-      <li class="nav-item mb-2">
-        <a class="nav-link" href="#">Perfil</a>
+      <li class="chat-item p-2">
+        <strong>María Gómez</strong><br>
+        <small>Re: Matrícula</small>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Historial</a>
+      <li class="chat-item p-2">
+        <strong>Carlos Ruiz</strong><br>
+        <small>Cancelación curso</small>
       </li>
     </ul>
   </div>
-
-  <div class="content" id="main-content">
-    <!-- Vista de Asignaturas -->
-    <div id="asignaturas-view" class="view">
-      <h2 class="mb-4">Asignaturas disponibles</h2>
-      <div class="table-responsive">
-        <table class="table table-striped table-hover">
-          <thead>
-            <tr>
-              <th>Asignatura</th>
-              <th>Código</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-          <tbody id="asignaturas-table">
-            <!-- Datos dinámicos -->
-          </tbody>
-        </table>
+  <div class="content">
+    <div class="chat-header">
+      <h5 id="chat-with">Chat con Juan Pérez</h5>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="message received">
+        <p>Hola, profesor. ¿Puede orientarme sobre la inscripción?</p>
+        <small class="text-muted">01/05/2025 10:32</small>
+      </div>
+      <div class="message sent">
+        <p>Claro, con gusto. ¿Qué dudas tienes?</p>
+        <small class="text-light">01/05/2025 10:35</small>
+      </div>
+      <div class="message received">
+        <p>¿Cómo inscribo asignaturas con prerrequisitos?</p>
+        <small class="text-muted">01/05/2025 10:40</small>
       </div>
     </div>
-  </div>
-
-  <!-- Modal Cursos -->
-  <div class="modal fade" id="cursosModal" tabindex="-1" aria-labelledby="cursosModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="cursosModalLabel">Cursos disponibles</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <h6 id="curso-titulo" class="mb-3"></h6>
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-              <thead>
-                <tr>
-                  <th>Grupo</th>
-                  <th>Cupos</th>
-                  <th>Acción</th>
-                </tr>
-              </thead>
-              <tbody id="cursos-table">
-                <!-- Dinámico -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
+    <div class="chat-footer position-relative">
+      <input type="text" class="form-control" placeholder="Escribe un mensaje...">
+      <button class="send-btn"><i class="bi bi-send-fill"></i></button>
     </div>
   </div>
-
-  <!-- Modal Horario -->
-  <div class="modal fade" id="horarioModal" tabindex="-1" aria-labelledby="horarioModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-md">
-      <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="horarioModalLabel">Horario del curso</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <ul class="list-group" id="horario-list">
-            <!-- Detalles dinámicos -->
-          </ul>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bootstrap JS & Popper -->
-  <script 
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/js/bootstrap.bundle.min.js">
-  </script>
-  <script>
-    let sidebar = document.getElementById('sidebar');
-    let content = document.getElementById('main-content');
-    function toggleSidebar() {
-      sidebar.classList.toggle('collapsed');
-      content.classList.toggle('collapsed');
-    }
-
-    // Datos ampliados
-    const asignaturas = [
-      { id: 1, nombre: 'Matemáticas I', codigo: 'MAT101' },
-      { id: 2, nombre: 'Programación', codigo: 'INF201' },
-      { id: 3, nombre: 'Física General', codigo: 'FIS101' },
-      { id: 4, nombre: 'Química Orgánica', codigo: 'QUI301' },
-      { id: 5, nombre: 'Historia Universal', codigo: 'HIS102' }
-    ];
-    const cursos = {
-      1: [
-        { id: 11, grupo: 'A', inscritos: 15, capacidad: 20, horario: [{dia:'Lunes',hora:'8:00-10:00'},{dia:'Miércoles',hora:'8:00-10:00'}] },
-        { id: 12, grupo: 'B', inscritos: 20, capacidad: 20, horario: [{dia:'Martes',hora:'10:00-12:00'},{dia:'Jueves',hora:'10:00-12:00'}] }
-      ],
-      2: [
-        { id: 21, grupo: 'A', inscritos: 5, capacidad: 30, horario: [{dia:'Lunes',hora:'14:00-16:00'},{dia:'Miércoles',hora:'14:00-16:00'}] },
-        { id: 22, grupo: 'B', inscritos: 30, capacidad: 30, horario: [{dia:'Martes',hora:'16:00-18:00'},{dia:'Jueves',hora:'16:00-18:00'}] }
-      ],
-      3: [
-        { id: 31, grupo: 'Único', inscritos: 10, capacidad: 25, horario: [{dia:'Viernes',hora:'8:00-12:00'}] }
-      ],
-      4: [
-        { id: 41, grupo: 'A', inscritos: 8, capacidad: 20, horario: [{dia:'Lunes',hora:'10:00-12:00'},{dia:'Miércoles',hora:'10:00-12:00'}] }
-      ],
-      5: [
-        { id: 51, grupo: 'A', inscritos: 20, capacidad: 20, horario: [{dia:'Martes',hora:'8:00-10:00'},{dia:'Jueves',hora:'8:00-10:00'}] }
-      ]
-    };
-
-    function cargarAsignaturas() {
-      const tbody = document.getElementById('asignaturas-table');
-      tbody.innerHTML = '';
-      asignaturas.forEach(a => {
-        tbody.innerHTML += `
-          <tr class="fade-enter-active">
-            <td>${a.nombre}</td>
-            <td>${a.codigo}</td>
-            <td>
-              <button class="btn btn-light btn-sm" onclick="mostrarCursos(${a.id}, '${a.nombre}')">Matricular</button>
-            </td>
-          </tr>`;
-      });
-    }
-
-    function showView(id) {
-      document.querySelectorAll('.view').forEach(v => v.style.display='none');
-      document.getElementById(id).style.display='block';
-    }
-
-    function mostrarCursos(asigId, asigNombre) {
-      document.getElementById('curso-titulo').textContent = `Cursos de ${asigNombre}`;
-      const tbody = document.getElementById('cursos-table'); tbody.innerHTML = '';
-      cursos[asigId].forEach(c => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${c.grupo}</td>
-            <td>${c.inscritos}/${c.capacidad}</td>
-            <td>
-              <button class="btn btn-light btn-sm me-2" onclick="inscribir(${c.id})" ${c.inscritos>=c.capacidad?'disabled':''}>Inscribir</button>
-              <button class="btn btn-outline-danger btn-sm" onclick="mostrarHorario(${asigId},${c.id})">Ver Horario</button>
-            </td>
-          </tr>`;
-      });
-      new bootstrap.Modal(document.getElementById('cursosModal')).show();
-    }
-
-    function mostrarHorario(asigId, cursoId) {
-      const curso = cursos[asigId].find(c=>c.id===cursoId);
-      const ul = document.getElementById('horario-list'); ul.innerHTML = '';
-      curso.horario.forEach(h=>{
-        ul.innerHTML += `<li class="list-group-item"><strong>${h.dia}:</strong> ${h.hora}</li>`;
-      });
-      new bootstrap.Modal(document.getElementById('horarioModal')).show();
-    }
-
-    function inscribir(cursoId) {
-      alert(`Te has inscrito en el curso ID ${cursoId}`);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      cargarAsignaturas();
-      showView('asignaturas-view');
-    });
-  </script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Icons CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.js"></script>
 </body>
 </html>
