@@ -10,88 +10,101 @@
     rel="stylesheet"
   />
   <style>
-    body { height: 100vh; overflow: hidden; }
+    body, html { height: 100%; margin: 0; }
     .sidebar {
       background-color: #dc3545;
-      color: white;
+      color: #fff;
       height: 100%;
+      position: fixed;
+      width: 200px;
       padding-top: 1rem;
+      transition: width 0.3s;
     }
-    .sidebar a {
-      color: white;
-      text-decoration: none;
+    .sidebar.collapsed { width: 60px; }
+    .sidebar h4 {
+      text-align: center;
+      margin-bottom: 1rem;
+      transition: opacity 0.3s;
     }
-    .sidebar .nav-link.active {
+    .sidebar.collapsed h4 { opacity: 0; }
+    .sidebar .nav-link {
+      color: #fff;
+      transition: background 0.2s;
+    }
+    .sidebar .nav-link:hover {
       background-color: #b02a37;
     }
     .content {
+      margin-left: 200px;
       padding: 1rem;
-      height: 100%;
-      overflow-y: auto;
+      transition: margin-left 0.3s;
     }
+    .sidebar.collapsed + .content { margin-left: 60px; }
     .table-responsive { max-height: calc(100vh - 200px); overflow-y: auto; }
+    .fade-enter {
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.3s;
+    }
+    .fade-enter-active {
+      opacity: 1;
+      transform: translateX(0);
+    }
   </style>
 </head>
 <body>
-  <div class="container-fluid h-100">
-    <div class="row h-100">
-      <!-- Sidebar -->
-      <nav class="col-2 sidebar d-flex flex-column">
-        <h4 class="text-center">Menú</h4>
-        <ul class="nav nav-pills flex-column mt-3">
-          <li class="nav-item mb-2">
-            <a class="nav-link active" href="#" id="menu-matricula" onclick="mostrarAsignaturas()">Matrícula</a>
-          </li>
-          <!-- Aquí puedes agregar más opciones -->
-          <li class="nav-item mb-2">
-            <a class="nav-link" href="#">Perfil</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Historial</a>
-          </li>
-        </ul>
-      </nav>
+  <div class="sidebar" id="sidebar">
+    <h4>Menú</h4>
+    <button class="btn btn-sm btn-light ms-2 mb-3" onclick="toggleSidebar()">☰</button>
+    <ul class="nav nav-pills flex-column">
+      <li class="nav-item mb-2">
+        <a class="nav-link active" href="#" id="menu-matricula" onclick="showView('asignaturas-view')">Matrícula</a>
+      </li>
+      <li class="nav-item mb-2">
+        <a class="nav-link" href="#">Perfil</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Historial</a>
+      </li>
+    </ul>
+  </div>
 
-      <!-- Content -->
-      <main class="col-10 content">
-        <!-- Vista de Asignaturas -->
-        <div id="asignaturas-view">
-          <h2 class="mb-4">Asignaturas disponibles</h2>
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Asignatura</th>
-                  <th>Código</th>
-                  <th>Acción</th>
-                </tr>
-              </thead>
-              <tbody id="asignaturas-table">
-                <!-- Datos dinámicos -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </main>
+  <div class="content" id="main-content">
+    <!-- Vista de Asignaturas -->
+    <div id="asignaturas-view" class="view">
+      <h2 class="mb-4">Asignaturas disponibles</h2>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Asignatura</th>
+              <th>Código</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="asignaturas-table">
+            <!-- Datos dinámicos -->
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
   <!-- Modal Cursos -->
   <div class="modal fade" id="cursosModal" tabindex="-1" aria-labelledby="cursosModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
       <div class="modal-content">
-        <div class="modal-header" style="background-color: #dc3545; color: white;">
+        <div class="modal-header bg-danger text-white">
           <h5 class="modal-title" id="cursosModalLabel">Cursos disponibles</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
-          <h6 id="curso-titulo"></h6>
+          <h6 id="curso-titulo" class="mb-3"></h6>
           <div class="table-responsive">
-            <table class="table table-bordered">
+            <table class="table table-bordered table-hover">
               <thead>
                 <tr>
                   <th>Grupo</th>
-                  <th>Horario</th>
                   <th>Cupos</th>
                   <th>Acción</th>
                 </tr>
@@ -109,76 +122,120 @@
     </div>
   </div>
 
+  <!-- Modal Horario -->
+  <div class="modal fade" id="horarioModal" tabindex="-1" aria-labelledby="horarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="horarioModalLabel">Horario del curso</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group" id="horario-list">
+            <!-- Detalles dinámicos -->
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Bootstrap JS & Popper -->
   <script 
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/js/bootstrap.bundle.min.js">
   </script>
   <script>
-    // Datos simulados
+    let sidebar = document.getElementById('sidebar');
+    let content = document.getElementById('main-content');
+    function toggleSidebar() {
+      sidebar.classList.toggle('collapsed');
+      content.classList.toggle('collapsed');
+    }
+
+    // Datos ampliados
     const asignaturas = [
       { id: 1, nombre: 'Matemáticas I', codigo: 'MAT101' },
       { id: 2, nombre: 'Programación', codigo: 'INF201' },
-      { id: 3, nombre: 'Física General', codigo: 'FIS101' }
+      { id: 3, nombre: 'Física General', codigo: 'FIS101' },
+      { id: 4, nombre: 'Química Orgánica', codigo: 'QUI301' },
+      { id: 5, nombre: 'Historia Universal', codigo: 'HIS102' }
     ];
     const cursos = {
       1: [
-        { grupo: 'A', horario: 'Lun/Mié 8:00 - 10:00', inscritos: 15, capacidad: 20 },
-        { grupo: 'B', horario: 'Mar/Jue 10:00 - 12:00', inscritos: 20, capacidad: 20 }
+        { id: 11, grupo: 'A', inscritos: 15, capacidad: 20, horario: [{dia:'Lunes',hora:'8:00-10:00'},{dia:'Miércoles',hora:'8:00-10:00'}] },
+        { id: 12, grupo: 'B', inscritos: 20, capacidad: 20, horario: [{dia:'Martes',hora:'10:00-12:00'},{dia:'Jueves',hora:'10:00-12:00'}] }
       ],
       2: [
-        { grupo: 'A', horario: 'Lun/Mié 14:00 - 16:00', inscritos: 5, capacidad: 30 },
-        { grupo: 'B', horario: 'Mar/Jue 16:00 - 18:00', inscritos: 30, capacidad: 30 }
+        { id: 21, grupo: 'A', inscritos: 5, capacidad: 30, horario: [{dia:'Lunes',hora:'14:00-16:00'},{dia:'Miércoles',hora:'14:00-16:00'}] },
+        { id: 22, grupo: 'B', inscritos: 30, capacidad: 30, horario: [{dia:'Martes',hora:'16:00-18:00'},{dia:'Jueves',hora:'16:00-18:00'}] }
       ],
       3: [
-        { grupo: 'Único', horario: 'Vie 8:00 - 12:00', inscritos: 10, capacidad: 25 }
+        { id: 31, grupo: 'Único', inscritos: 10, capacidad: 25, horario: [{dia:'Viernes',hora:'8:00-12:00'}] }
+      ],
+      4: [
+        { id: 41, grupo: 'A', inscritos: 8, capacidad: 20, horario: [{dia:'Lunes',hora:'10:00-12:00'},{dia:'Miércoles',hora:'10:00-12:00'}] }
+      ],
+      5: [
+        { id: 51, grupo: 'A', inscritos: 20, capacidad: 20, horario: [{dia:'Martes',hora:'8:00-10:00'},{dia:'Jueves',hora:'8:00-10:00'}] }
       ]
     };
 
-    // Render Asignaturas
     function cargarAsignaturas() {
       const tbody = document.getElementById('asignaturas-table');
       tbody.innerHTML = '';
       asignaturas.forEach(a => {
         tbody.innerHTML += `
-          <tr>
+          <tr class="fade-enter-active">
             <td>${a.nombre}</td>
             <td>${a.codigo}</td>
             <td>
-              <button class="btn btn-light btn-sm" onclick="mostrarCursos(${a.id}, '${a.nombre}')">
-                Matricular
-              </button>
+              <button class="btn btn-light btn-sm" onclick="mostrarCursos(${a.id}, '${a.nombre}')">Matricular</button>
             </td>
           </tr>`;
       });
     }
 
-    // Mostrar Asignaturas al hacer clic en menú
-    function mostrarAsignaturas() {
-      document.getElementById('asignaturas-view').scrollIntoView({ behavior: 'smooth' });
+    function showView(id) {
+      document.querySelectorAll('.view').forEach(v => v.style.display='none');
+      document.getElementById(id).style.display='block';
     }
 
-    // Mostrar Cursos en Modal
     function mostrarCursos(asigId, asigNombre) {
       document.getElementById('curso-titulo').textContent = `Cursos de ${asigNombre}`;
-      const tbody = document.getElementById('cursos-table');
-      tbody.innerHTML = '';
+      const tbody = document.getElementById('cursos-table'); tbody.innerHTML = '';
       cursos[asigId].forEach(c => {
         tbody.innerHTML += `
           <tr>
             <td>${c.grupo}</td>
-            <td>${c.horario}</td>
             <td>${c.inscritos}/${c.capacidad}</td>
             <td>
-              <button class="btn btn-white btn-sm" ${c.inscritos>=c.capacidad? 'disabled':''}>
-                Inscribir
-              </button>
+              <button class="btn btn-light btn-sm me-2" onclick="inscribir(${c.id})" ${c.inscritos>=c.capacidad?'disabled':''}>Inscribir</button>
+              <button class="btn btn-outline-danger btn-sm" onclick="mostrarHorario(${asigId},${c.id})">Ver Horario</button>
             </td>
           </tr>`;
       });
       new bootstrap.Modal(document.getElementById('cursosModal')).show();
     }
 
-    document.addEventListener('DOMContentLoaded', cargarAsignaturas);
+    function mostrarHorario(asigId, cursoId) {
+      const curso = cursos[asigId].find(c=>c.id===cursoId);
+      const ul = document.getElementById('horario-list'); ul.innerHTML = '';
+      curso.horario.forEach(h=>{
+        ul.innerHTML += `<li class="list-group-item"><strong>${h.dia}:</strong> ${h.hora}</li>`;
+      });
+      new bootstrap.Modal(document.getElementById('horarioModal')).show();
+    }
+
+    function inscribir(cursoId) {
+      alert(`Te has inscrito en el curso ID ${cursoId}`);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarAsignaturas();
+      showView('asignaturas-view');
+    });
   </script>
 </body>
 </html>
