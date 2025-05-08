@@ -9,46 +9,103 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/css/bootstrap.min.css" 
     rel="stylesheet"
   />
+  <style>
+    body { height: 100vh; overflow: hidden; }
+    .sidebar {
+      background-color: #dc3545;
+      color: white;
+      height: 100%;
+      padding-top: 1rem;
+    }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+    }
+    .sidebar .nav-link.active {
+      background-color: #b02a37;
+    }
+    .content {
+      padding: 1rem;
+      height: 100%;
+      overflow-y: auto;
+    }
+    .table-responsive { max-height: calc(100vh - 200px); overflow-y: auto; }
+  </style>
 </head>
 <body>
-  <div class="container py-5">
-    <!-- Título -->
-    <h1 class="mb-4">Matrícula e Inscripción</h1>
+  <div class="container-fluid h-100">
+    <div class="row h-100">
+      <!-- Sidebar -->
+      <nav class="col-2 sidebar d-flex flex-column">
+        <h4 class="text-center">Menú</h4>
+        <ul class="nav nav-pills flex-column mt-3">
+          <li class="nav-item mb-2">
+            <a class="nav-link active" href="#" id="menu-matricula" onclick="mostrarAsignaturas()">Matrícula</a>
+          </li>
+          <!-- Aquí puedes agregar más opciones -->
+          <li class="nav-item mb-2">
+            <a class="nav-link" href="#">Perfil</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Historial</a>
+          </li>
+        </ul>
+      </nav>
 
-    <!-- 1) Lista de Asignaturas -->
-    <div id="asignaturas-view">
-      <h2>Asignaturas disponibles</h2>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Asignatura</th>
-            <th>Código</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody id="asignaturas-table">
-          <!-- Se llena dinámicamente -->
-        </tbody>
-      </table>
+      <!-- Content -->
+      <main class="col-10 content">
+        <!-- Vista de Asignaturas -->
+        <div id="asignaturas-view">
+          <h2 class="mb-4">Asignaturas disponibles</h2>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Asignatura</th>
+                  <th>Código</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="asignaturas-table">
+                <!-- Datos dinámicos -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
     </div>
+  </div>
 
-    <!-- 2) Lista de Cursos para la asignatura seleccionada -->
-    <div id="cursos-view" class="d-none">
-      <button class="btn btn-link mb-3" onclick="volver();">&larr; Volver a Asignaturas</button>
-      <h2 id="curso-titulo">Cursos de [Asignatura]</h2>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Grupo</th>
-            <th>Horario</th>
-            <th>Cupos</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody id="cursos-table">
-          <!-- Se llena dinámicamente -->
-        </tbody>
-      </table>
+  <!-- Modal Cursos -->
+  <div class="modal fade" id="cursosModal" tabindex="-1" aria-labelledby="cursosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #dc3545; color: white;">
+          <h5 class="modal-title" id="cursosModalLabel">Cursos disponibles</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <h6 id="curso-titulo"></h6>
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Grupo</th>
+                  <th>Horario</th>
+                  <th>Cupos</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="cursos-table">
+                <!-- Dinámico -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -57,7 +114,7 @@
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/js/bootstrap.bundle.min.js">
   </script>
   <script>
-    // Simulación de datos
+    // Datos simulados
     const asignaturas = [
       { id: 1, nombre: 'Matemáticas I', codigo: 'MAT101' },
       { id: 2, nombre: 'Programación', codigo: 'INF201' },
@@ -77,7 +134,7 @@
       ]
     };
 
-    // Pinta la lista de asignaturas
+    // Render Asignaturas
     function cargarAsignaturas() {
       const tbody = document.getElementById('asignaturas-table');
       tbody.innerHTML = '';
@@ -87,10 +144,7 @@
             <td>${a.nombre}</td>
             <td>${a.codigo}</td>
             <td>
-              <button
-                class="btn btn-primary btn-sm"
-                onclick="mostrarCursos(${a.id}, '${a.nombre}')"
-              >
+              <button class="btn btn-light btn-sm" onclick="mostrarCursos(${a.id}, '${a.nombre}')">
                 Matricular
               </button>
             </td>
@@ -98,10 +152,13 @@
       });
     }
 
-    // Muestra la vista de cursos para una asignatura
+    // Mostrar Asignaturas al hacer clic en menú
+    function mostrarAsignaturas() {
+      document.getElementById('asignaturas-view').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Mostrar Cursos en Modal
     function mostrarCursos(asigId, asigNombre) {
-      document.getElementById('asignaturas-view').classList.add('d-none');
-      document.getElementById('cursos-view').classList.remove('d-none');
       document.getElementById('curso-titulo').textContent = `Cursos de ${asigNombre}`;
       const tbody = document.getElementById('cursos-table');
       tbody.innerHTML = '';
@@ -112,26 +169,16 @@
             <td>${c.horario}</td>
             <td>${c.inscritos}/${c.capacidad}</td>
             <td>
-              <button
-                class="btn btn-success btn-sm"
-                ${c.inscritos >= c.capacidad ? 'disabled' : ''}
-              >
+              <button class="btn btn-white btn-sm" ${c.inscritos>=c.capacidad? 'disabled':''}>
                 Inscribir
               </button>
             </td>
           </tr>`;
       });
+      new bootstrap.Modal(document.getElementById('cursosModal')).show();
     }
 
-    // Volver al listado de asignaturas
-    function volver() {
-      document.getElementById('cursos-view').classList.add('d-none');
-      document.getElementById('asignaturas-view').classList.remove('d-none');
-    }
-
-    // Inicialización
     document.addEventListener('DOMContentLoaded', cargarAsignaturas);
   </script>
 </body>
 </html>
-
